@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+export PATH="$PATH:/home/tbooth/tings/bl8_vbox_autoinstall/packer/packer-0.7.1"
+export CONFDIR="$(readlink -f "`dirname $0`")"
+
+export PACKER_LOG=1
+#export DEBUG=-debug
+
+# Note prerequisites to build this thingy:
+## packer 0.6+
+## virtualbox
+## json_pp (optional)
+
+# Build in my public area because it's not on encrypted loopback
+mkdir -p ~/Public/packer
+cd ~/Public/packer
+
+# It's useful for me to be able to comment lines in the JSON, but Packer doesn't like
+# this, so...
+json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
+    cp "$CONFDIR"/packer.json packer.pp.json
+
+rm -rf packer_virtualbox-iso_virtualbox.box output-virtualbox-iso
+rm -rf ~/VirtualBox\ VMs/packer-virtualbox-iso  # careful!
+packer build $DEBUG -only virtualbox-iso -var confdir="$CONFDIR" ./packer.pp.json
+
+
