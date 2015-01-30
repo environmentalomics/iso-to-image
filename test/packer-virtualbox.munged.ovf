@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<Envelope ovf:version="1.0" xml:lang="en-US"
+    xmlns="http://schemas.dmtf.org/ovf/envelope/1"
+    xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"
+    xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData"
+    xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vcloud="http://www.vmware.com/vcloud/v1.5"
+    xmlns:vbox="http://www.virtualbox.org/ovf/machine">
+  <References>
+    <File ovf:href="packer-virtualbox-ovf-1413886056-disk1.vmdk" ovf:id="file1"/>
+  </References>
+  <DiskSection>
+    <Info>List of the virtual disks used in the package</Info>
+    <Disk ovf:capacity="2265972736" ovf:capacityAllocationUnits="byte" ovf:diskId="vmdisk2" ovf:fileRef="file1" ovf:format="http://www.vmware.com/interfaces/specifications/vmdk.html#streamOptimized" vbox:uuid="5156dec1-f483-4a17-8a72-be63ae4a31fa"/>
+  </DiskSection>
+  <NetworkSection>
+    <Info>Logical networks used in the package</Info>
+    <Network ovf:name="eoscloud-U-NERCvSE">
+      <Description>Logical network used by this appliance.</Description>
+    </Network>
+  </NetworkSection>
+  <vcloud:CustomizationSection goldMaster="false" ovf:required="false">
+    <ovf:Info>VApp template customization section</ovf:Info>
+    <vcloud:CustomizeOnInstantiate>true</vcloud:CustomizeOnInstantiate>
+  </vcloud:CustomizationSection>
+  <vcloud:NetworkConfigSection ovf:required="false">
+    <ovf:Info>The configuration parameters for logical networks</ovf:Info>
+    <vcloud:NetworkConfig networkName="eoscloud-U-NERCvSE">
+	<vcloud:Configuration>
+	    <vcloud:ParentNetwork href="" name="eoscloud-U-NERCvSE"/>
+	    <vcloud:FenceMode>bridged</vcloud:FenceMode>
+	    <vcloud:RetainNetInfoAcrossDeployments>false</vcloud:RetainNetInfoAcrossDeployments>
+	</vcloud:Configuration>
+	<vcloud:IsDeployed>false</vcloud:IsDeployed>
+    </vcloud:NetworkConfig>
+  </vcloud:NetworkConfigSection>
+  <VirtualSystem ovf:id="test-name" xmlns:vmw="http://www.vmware.com/schema/ovf">
+    <Info>A virtual machine</Info>
+    <OperatingSystemSection ovf:id="94" vmw:osType="ubuntu64Guest">
+      <Info>The kind of installed guest operating system</Info>
+      <Description>Ubuntu_64</Description>
+      <vbox:OSType ovf:required="false">Ubuntu_64</vbox:OSType>
+    </OperatingSystemSection>
+    <VirtualHardwareSection>
+      <Info>Virtual hardware requirements for a virtual machine</Info>
+      <System>
+        <vssd:ElementName>Virtual Hardware Family</vssd:ElementName>
+        <vssd:InstanceID>0</vssd:InstanceID>
+        <vssd:VirtualSystemIdentifier>test-name</vssd:VirtualSystemIdentifier>
+        <vssd:VirtualSystemType>vmx-10</vssd:VirtualSystemType>
+      </System>
+      <Item>
+        <rasd:Caption>2 virtual CPU</rasd:Caption>
+        <rasd:Description>Number of virtual CPUs</rasd:Description>
+        <rasd:ElementName>2 virtual CPU</rasd:ElementName>
+        <rasd:InstanceID>1</rasd:InstanceID>
+        <rasd:ResourceType>3</rasd:ResourceType>
+        <rasd:VirtualQuantity>2</rasd:VirtualQuantity>
+      </Item>
+      <Item>
+        <rasd:AllocationUnits>byte * 2^20</rasd:AllocationUnits>
+        <rasd:Caption>2048 MB of memory</rasd:Caption>
+        <rasd:Description>Memory Size</rasd:Description>
+        <rasd:ElementName>2048 MB of memory</rasd:ElementName>
+        <rasd:InstanceID>2</rasd:InstanceID>
+        <rasd:ResourceType>4</rasd:ResourceType>
+        <rasd:VirtualQuantity>2048</rasd:VirtualQuantity>
+      </Item>
+      <Item>
+        <rasd:Address>0</rasd:Address>
+        <rasd:Caption>ideController0</rasd:Caption>
+        <rasd:Description>IDE Controller</rasd:Description>
+        <rasd:ElementName>ideController0</rasd:ElementName>
+        <rasd:InstanceID>3</rasd:InstanceID>
+        <rasd:ResourceSubType>PIIX4</rasd:ResourceSubType>
+        <rasd:ResourceType>5</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:Address>1</rasd:Address>
+        <rasd:Caption>ideController1</rasd:Caption>
+        <rasd:Description>IDE Controller</rasd:Description>
+        <rasd:ElementName>ideController1</rasd:ElementName>
+        <rasd:InstanceID>4</rasd:InstanceID>
+        <rasd:ResourceSubType>PIIX4</rasd:ResourceSubType>
+        <rasd:ResourceType>5</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:Address>0</rasd:Address>
+        <rasd:Caption>sataController0</rasd:Caption>
+        <rasd:Description>SATA Controller</rasd:Description>
+        <rasd:ElementName>sataController0</rasd:ElementName>
+        <rasd:InstanceID>5</rasd:InstanceID>
+        <rasd:ResourceSubType>VirtualSCSI</rasd:ResourceSubType>
+        <rasd:ResourceType>6</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:Address>0</rasd:Address>
+        <rasd:Caption>usb</rasd:Caption>
+        <rasd:Description>USB Controller</rasd:Description>
+        <rasd:ElementName>usb</rasd:ElementName>
+        <rasd:InstanceID>6</rasd:InstanceID>
+        <rasd:ResourceType>23</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:AddressOnParent>0</rasd:AddressOnParent>
+        <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
+        <rasd:Caption>cdrom1</rasd:Caption>
+        <rasd:Description>CD-ROM Drive</rasd:Description>
+        <rasd:ElementName>cdrom1</rasd:ElementName>
+        <rasd:InstanceID>8</rasd:InstanceID>
+        <rasd:Parent>4</rasd:Parent>
+        <rasd:ResourceType>15</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:AddressOnParent>0</rasd:AddressOnParent>
+        <rasd:Caption>disk2</rasd:Caption>
+        <rasd:Description>Disk Image</rasd:Description>
+        <rasd:ElementName>disk2</rasd:ElementName>
+        <rasd:HostResource>ovf:/disk/vmdisk2</rasd:HostResource>
+        <rasd:InstanceID>9</rasd:InstanceID>
+        <rasd:Parent>5</rasd:Parent>
+        <rasd:ResourceType>17</rasd:ResourceType>
+      </Item>
+      <Item>
+        <rasd:AutomaticAllocation>true</rasd:AutomaticAllocation>
+        <rasd:Caption>Ethernet adapter on 'NAT'</rasd:Caption>
+	<rasd:Connection vcloud:ipAddressingMode="POOL" vcloud:primaryNetworkConnection="true"
+            >eoscloud-U-NERCvSE</rasd:Connection>
+        <rasd:ElementName>Ethernet adapter on 'NAT'</rasd:ElementName>
+        <rasd:InstanceID>10</rasd:InstanceID>
+        <rasd:ResourceSubType>VMXNET3</rasd:ResourceSubType>
+        <rasd:ResourceType>10</rasd:ResourceType>
+      </Item>
+	<vmw:Config ovf:required="false" vmw:key="cpuHotAddEnabled" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="cpuHotRemoveEnabled" vmw:value="false"/>
+	<vmw:Config ovf:required="false" vmw:key="firmware" vmw:value="bios"/>
+	<vmw:Config ovf:required="false" vmw:key="virtualICH7MPresent" vmw:value="false"/>
+	<vmw:Config ovf:required="false" vmw:key="virtualSMCPresent" vmw:value="false"/>
+	<vmw:Config ovf:required="false" vmw:key="memoryHotAddEnabled" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="nestedHVEnabled" vmw:value="false"/>
+	<vmw:Config ovf:required="false" vmw:key="powerOpInfo.powerOffType" vmw:value="soft"/>
+	<vmw:Config ovf:required="false" vmw:key="powerOpInfo.resetType" vmw:value="soft"/>
+	<vmw:Config ovf:required="false" vmw:key="powerOpInfo.standbyAction" vmw:value="checkpoint"/>
+	<vmw:Config ovf:required="false" vmw:key="powerOpInfo.suspendType" vmw:value="hard"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.afterPowerOn" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.afterResume" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.beforeGuestShutdown" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.beforeGuestStandby" vmw:value="true"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.syncTimeWithHost" vmw:value="false"/>
+	<vmw:Config ovf:required="false" vmw:key="tools.toolsUpgradePolicy" vmw:value="manual"/>
+    </VirtualHardwareSection>
+    <vcloud:GuestCustomizationSection ovf:required="false">
+	<ovf:Info>Specifies Guest OS Customization Settings</ovf:Info>
+	<vcloud:Enabled>true</vcloud:Enabled>
+	<vcloud:ChangeSid>false</vcloud:ChangeSid>
+	<vcloud:JoinDomainEnabled>false</vcloud:JoinDomainEnabled>
+	<vcloud:UseOrgSettings>false</vcloud:UseOrgSettings>
+	<vcloud:AdminPasswordEnabled>false</vcloud:AdminPasswordEnabled>
+	<vcloud:AdminPasswordAuto>false</vcloud:AdminPasswordAuto>
+	<vcloud:ResetPasswordRequired>false</vcloud:ResetPasswordRequired>
+	<vcloud:CustomizationScript>#!/bin/sh
+/etc/ESXCustomisation.sh &quot;$@&quot; ; [ 69 != $? ]
+</vcloud:CustomizationScript>
+	<vcloud:ComputerName>test-name</vcloud:ComputerName>
+    </vcloud:GuestCustomizationSection>
+  </VirtualSystem>
+</Envelope>
