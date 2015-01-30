@@ -1,0 +1,66 @@
+{
+  "variables" : {
+      "confdir" : ".",
+      "passwd"  : "manager",
+      "ovf"     : "ubuntu.ovf"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "source_path": "{{user `ovf`}}",
+      "ssh_username": "manager",
+      "ssh_password": "{{user `passwd`}}",
+      "ssh_wait_timeout": "120s",
+      "shutdown_command": "echo {{user `passwd`}} | sudo -S shutdown -P now",
+      "headless": false,
+      "virtualbox_version_file": ".vbox_version",
+      "guest_additions_mode": "disable",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "2048"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ]
+      ]
+    }
+  ],
+  "post-processors": [
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "{{user `confdir`}}/files/packer-esx",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "override": {
+        "virtualbox-ovf": {
+          "execute_command": "echo {{user `passwd`}} | sudo -S env {{ .Vars }} bash '{{ .Path }}'"
+       }
+      },
+      "scripts": [
+        "{{user `confdir`}}/scripts/root_setup_vc.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "override": {
+        "virtualbox-ovf": {
+          "execute_command": "env {{ .Vars }} bash '{{ .Path }}'"
+       }
+      },
+      "scripts": [
+        "{{user `confdir`}}/scripts/setup_vc.sh"
+      ]
+    }
+  ]
+}
+

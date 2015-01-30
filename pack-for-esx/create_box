@@ -1,0 +1,72 @@
+#!/bin/bash
+
+set -e
+
+# What OVF to actually work on?
+# This would normally be the Bio-Linux OVF, but for testing I have minibuntu
+OVF="${OVF:-/home/tbooth_Public/packer/ubuntu_14.04_minimal.ova}"
+
+export PATH="$PATH:/home/tbooth/tings/bl8_vbox_autoinstall/packer/packer-0.7.1"
+export CONFDIR="$(readlink -f "`dirname $0`")"
+export PATCH_VMDK="$CONFDIR/patch_vmdk"
+
+export PACKER_LOG=1
+#export DEBUG=-debug
+
+# Note prerequisites to build this thingy:
+## packer 0.7+
+## virtualbox
+## json_pp (optional)
+
+# Build in my Public area because it's not on encrypted loopback
+mkdir -p ~/Public/packer
+cd ~/Public/packer
+
+# Slightly paranoid/careful deletion of the old directory.
+if [ -d output-virtualbox-ovf ] ; then
+    rm output-virtualbox-ovf/*.ovf || true
+    rm output-virtualbox-ovf/*.vmdk || true
+    rmdir output-virtualbox-ovf
+fi
+
+# It's useful for me to be able to comment lines in the JSON, but Packer doesn't like
+# this, so...
+json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
+    cp "$CONFDIR"/packer.json packer.pp.json
+
+packer build $DEBUG -only virtualbox-ovf -var confdir="$CONFDIR" -var ovf="$OVF" ./packer.pp.json
+
+# This is a silly function.  But I like it.
+make_prefix()
+{
+    log="$HOME/.pack_for_esx_upload.log"
+
+    ( flock 9 || exit 1
+      lastprfx=`tail -n1 "$log" | cut -d\| -f 1`
+      echo $'\n'{a..z}{a..z} | grep -C1 $lastprfx | tail -n1 | tr -d '\n ' | tee -a "$log"
+      echo "|`date`|$1" >> "$log"
+    ) 9<"$log" || exit 1
+}
+
+# Patch the VMDK for VMWare.  This is idempotent and shouldn't stop it working in
+# VirtualBox so do this every time.
+for vmdk in output-virtualbox-ovf/*.vmdk ; do
+    [ -f "$vmdk" ]
+    "$PATCH_VMDK" "$vmdk"
+done
+
+# Now push the result to EOS cloud
+if echo "$*" | grep -q -- -p ; then
+
+    prefix=`make_prefix "$OVF"`
+
+    uploader=/home/tbooth/sandbox/environmentalomics_github/uploader.py
+
+    cd output-virtualbox-ovf/
+
+    ovf_to_push=`ls -t *.ovf | head -n 1`
+    [ -f "$ovf_to_push" ]
+
+    "$uploader" minibuntu --ovf_file "$ovf_to_push" --prefix $prefix
+
+fi

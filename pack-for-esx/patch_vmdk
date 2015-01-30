@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+# The aim of the game here is to fudge the metadata on the VMDK without
+# changing the size of the file.
+# Fortunately there is no nasty checksum to recalculate.
+# As a bonus, this should be idempotent.
+
+# vboxmanage modifyhd ./snap1-minibuntu-disk1.vmdk --property ddb.virtualHWVersion="10"
+# sadly does not help us do this :-(
+
+import sys
+
+metadata_to_insert = {
+    "ddb.toolsVersion"     : '"9349"',
+    "ddb.virtualHWVersion" : '"10"',
+    "ddb.comment"          : '"Patched by patch_vmdk"'
+    }
+
+file_to_fix = sys.argv[1]
+
+fh = open(file_to_fix, 'rb+')
+
+# 1) Scan until we find "# Disk DescriptorFile"
+# 2) Scan until we see a terminating zero byte
+# 3) Munge the text from this section of the file
+# 4) Splat it back at the position we found in 1
+# 5) Profit
+
+# I think we can reasonably assume 1 and 2 will happen well within the first 0x10000 bytes.
+# As far as I can see this is a fixed-length header.
+
+header_block = fh.read(0x10000)
+
+if len(header_block) != 0x10000 :
+    raise Exception("Did not get a full header from the file %s" % file_to_fix)
+
+dd_start = header_block.find(b"# Disk DescriptorFile")
+
+if dd_start == -1 :
+    raise Exception("Did not find '# Disk DescriptorFile' in the file %s" % file_to_fix)
+
+dd_end = header_block.find(b"\0", dd_start)
+
+# I'm assuming the header is technically encoded in ASCII and not UTF-8, but hopefully
+# it makes no difference.
+dd_lines = header_block[dd_start:dd_end].decode('ascii').splitlines()
+
+print("Got the header for you:")
+for l in dd_lines: print(l)
+
+changes = 0
+
+for n, l in enumerate(dd_lines):
+    key = l.split('=',1)[0].rstrip()
+    newval = metadata_to_insert.get(key)
+    if newval:
+        del metadata_to_insert[key]
+        if dd_lines[n] != key + '=' + newval:
+            dd_lines[n] = key + '=' + newval
+            changes += 1
+
+changes += len(metadata_to_insert)
+for k, v in metadata_to_insert.items():
+    dd_lines.append(k + '=' + v)
+
+if changes:
+    print("Changed it to this (" + str(changes) + " changes):")
+    for l in dd_lines: print(l)
+
+    # Now splat this into the file.  Don't forget the final NUL byte.
+    fh.seek(dd_start)
+    for l in dd_lines:
+        fh.write( (l + '\n').encode('ascii') )
+    fh.write(b'\0')
+
+else:
+    print("No changes to make.")
+
+fh.close()

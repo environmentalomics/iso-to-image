@@ -1,2 +1,8 @@
 *.pyc
 *__/
+*~
+*.deb
+*.pp.json
+VMWare_Guest_Tools_*.tar
+*.gz
+id_*.pub
