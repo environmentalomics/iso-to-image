@@ -171,7 +171,7 @@ def process_args() :
     parser.add_argument('--ovf_description', help='default: %s' % ovf_description)
     parser.add_argument('--prefix', help='default: %s' % template_prefix)
 
-    parser.add_argument('--no_munge', help='default: %s' % str(noop_munge), action='store_true')
+    parser.add_argument('--munge', help='default: %s' % str(not noop_munge), action='store_true')
 
     args = parser.parse_args()
 
@@ -184,6 +184,7 @@ def process_args() :
         ovf_name = args.ovf_name
         ovf_file = args.ovf_file or ovf_name + '.ovf'
 
+    #FIXME - this is a silly restriction.
     if '/' in ovf_file:
         raise Exception("OVF file needs to be in the current working directory.")
 
@@ -197,7 +198,8 @@ def process_args() :
     if args.ovf_description : ovf_description = args.ovf_description
     if args.prefix : template_prefix = args.prefix
 
-    if args.no_munge : noop_munge = True
+    noop_munge = True
+    if args.munge : noop_munge = False
 
     template_name = ("%s-%s" % (template_prefix, ovf_name)).lstrip('-')
 
@@ -353,9 +355,9 @@ def put_ovf(sess, vt) :
     sess.httpPUT(vt['ovf_put_url'], "text/xml", ovf_data)
     # Done, easy.
 
+#FIXME - if we are not munging this shouldn't be called at all.
 def munge_ovf_data(ovf_file, *args, **kwargs) :
 
-    from vCloudOVFMunger import munge_ovf_tree
     global noop_munge
 
     # Read the entire .ovf file, which should be in UTF-8, and return a munged serialised
@@ -366,6 +368,7 @@ def munge_ovf_data(ovf_file, *args, **kwargs) :
 
     # Munge can be bypassed but we still want to parse the XML to check it
     if not noop_munge:
+        from vCloudOVFMunger import munge_ovf_tree
         munge_ovf_tree(dom, *args, **kwargs)
 
     return str(ET.tostring(dom), encoding="UTF-8")
