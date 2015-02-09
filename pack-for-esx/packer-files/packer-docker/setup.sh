@@ -84,7 +84,7 @@ if ! grep -q '^ADD_EXTRA_GROUPS=1' /etc/adduser.conf ; then
     sed -i 's/^[ #]*\(ADD_EXTRA_GROUPS\)=.*/\1=1/' /etc/adduser.conf
 fi
 
-# 4 - Add Priyam account.  This obviously shouldn't go in the image build but I
+# 4 - Add Priyam account.  This obviously shouldn't go in the regular image build but I
 # add it here for completeness.  Also assures us that (3) worked.
 
 # Since the password is only good for sudo I'll set it the same as the user name.
@@ -94,9 +94,7 @@ echo "priyam" | tee - | passwd priyam 2>/dev/null
 usermod -aG sudo priyam
 
 su -c 'mkdir -p -m700 ~/.ssh' priyam
-cat <<. | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' priyam
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDNZJ5pdEINUQ31+AvZccxn/RK/1zfQHMI4N1Z+SrzyJ1J7dLz4gLRSfsTWSqibW0HQVezHUisO+advxWMDOGqMng1IoaCgkBYexhJ3SHvMn+RJ2pzxZpDZpEY9hHfc16TjtNGwUtdXLLfMI+jXZBTzzDdCn7kVLR6x/vKRWc1PjzSIWOUMdoSpxcy4vwZab3y9YgTF2k4qMDTUYH1lZozfVaJaRNLFjlsgQtySw6rJKGZT+p9M2DJDq5f7aLMktVTrMkQqnB765y0AtflN7crxPjEXAEmdFPr4B6WM3O2MUzngiDa8c5ObFi+Fvz5YfvdV773YCFjdQLwQrid3nIKX priyam@iMac
-.
+cat packer-docker/id_priyam.pub | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' priyam
 
 echo "User priyam looks like this:"
 id priyam
