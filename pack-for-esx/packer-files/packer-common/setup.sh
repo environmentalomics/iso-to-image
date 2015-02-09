@@ -13,7 +13,7 @@ set -e
 while read -r l ; do
     [ -z "$BASEURL" ] && break
     l="${l#* }"
-    wget -q "$BASEURL/$l"
+    ( cd packer-common && wget -q "$BASEURL/$l" )
 done <<.
 #==F VMWare_Guest_Tools_9.4.5_esx.tar
 #==F id_rsa.pub
@@ -44,7 +44,7 @@ else
     # Packer will ensure the file is there for me, or I could use packit.perl.
     # Note that I just tarred up the CD image, so I have to unpack twice.
 
-    tar -xvf VMWare_Guest_Tools_*.tar
+    tar -xvf packer-common/VMWare_Guest_Tools_*.tar
     tar -xvzf */VMwareTools-*.tar.gz
 
     ( cd vmware-tools-distrib &&
@@ -134,7 +134,7 @@ user-session=MATE
 .
 fi
 
-# TODO - implement the fix given here, to enable hardware hotplug:
+# Implement the fix given here, to enable hardware hotplug:
 # http://tech.vg.no/2014/01/08/how-to-make-ubuntu-play-nice-with-vmware/
 true <<EOF
 $ echo acpi_memhotplug | sudo tee -a /etc/modules
@@ -153,17 +153,19 @@ sed -i 's/^\(iface [a-z0-9]* inet\) dhcp/\1 manual/' /etc/network/interfaces
 
 # One solution - in the boot sequence run ESXfirstboot, which should
 # bootstrap vmware and then fix the networking and reboot (or something)
-efb=ESXfirstboot
-cp $efb.sh /etc/init.d/$efb
-chmod +x /etc/init.d/$efb
+# efb=ESXfirstboot
+# cp $efb.sh /etc/init.d/$efb
+# chmod +x /etc/init.d/$efb
 # Disabled in favour of proper hook...
 #for rc in 1 2 ; do ln -s ../init.d/$efb /etc/rc${rc}.d/S99$efb ; done
 
-# But we might be better just dropping the script in to be hooked when the VM is
-# started in JASMIN.  FIXME - what script does get run?  David told me.
+# Here is an actual post-customisation script.  This will be referenced
+# in the OVF
+# FIXME - what script does get run?  David told me.
 # For now...
-cp ESXCustomisation.sh /etc
-chmod +x /etc/ESXCustomisation.sh
+mkdir -p /etc/ESXCustomisation
+cp packer-common/ESXCustomisation.sh /etc/ESXCustomisation/main.sh
+chmod +x /etc/ESXCustomisation/main.sh
 
 # Turn off password based SSH and load the NEBC public key. Later this will be replaced by
 # "something better" (TM).
@@ -185,9 +187,18 @@ if su -c 'test -s ~/.ssh/authorized_keys' "$prime_user" ; then
     echo "~/.ssh/authorized_keys already has data.  Will not write to it."
 else
 
-    grep -q '' id_*.pub #ie. check id_*.pub has data
-    cat id_*.pub | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' "$prime_user"
+    grep -q '' packer-common/id_*.pub #ie. check id_*.pub has data
+    cat packer-common/id_*.pub | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' "$prime_user"
 fi
+
+# Kill the swap.  Not appropriate on ESX, as far as I can see.  Also with no
+# swap partition we can more easily do a cheeky disk resize post-customisation.
+bash packer-common/kill_swap.sh
+cp packer-common/expand_drive.sh /etc/ESXCustomisation/
+chmod +x /etc/ESXCustomisation/expand_drive.sh
+
+# Unattended upgrades are wanted by default.
+bash packer-common/unattended_upgrade.sh
 
 #After this, Packer can't work any more. You'd better have the key to get back in!
 sed -i 's/^#\?\(PasswordAuthentication \).*/\1 no/' /etc/ssh/sshd_config
@@ -206,6 +217,17 @@ restart ssh
 #     dns-nameservers 8.8.8.8 8.8.4.4
 #     dns-search nerc.ac.uk
 #     .
+
+# Allow for custom configuration flavour.
+packer_cust=`ls -d packer-* | grep -vFx packer-common`
+if [ -d "$packer_cust" ] ; then
+    if [ -e "$packer_cust"/ESXCustomisation.sh ] ; then
+	cp "$packer_cust"/ESXCustomisation.sh /etc/ESXCustomisation/extra.sh
+	chmod +x /etc/ESXCustomisation/extra.sh
+    fi
+    chmod +x "$packer_cust"/setup.sh
+    "$packer_cust"/setup.sh
+fi
 
 # That's all for now, so make your image and load it up.
 echo FINISHED

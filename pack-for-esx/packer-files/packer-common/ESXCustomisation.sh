@@ -55,6 +55,11 @@ dns-search nerc.ac.uk
 # 	dpkg-reconfigure openssh-server
 #     fi
 
+    # Claim any extra disk space.
+    if [ -x ./expand_drive.sh ] ; then
+	env LOG_TO="$l" ./expand_drive.sh
+    fi
+
     # Refresh the console login screen to show the new hostname
     pkill -HUP getty
 
@@ -65,10 +70,13 @@ dns-search nerc.ac.uk
     # that from happening?  I'll say that a status of 69 triggers this.
 
     exit 69
-
 else
     echo "Unknown action - quitting" >> $l
+    exit 1
+fi
 
+if [ -x ./extra.sh ] ; then
+    env LOG_TO="$l" ./extra.sh "$@"
 fi
 
 echo "DONE OK" >> $l

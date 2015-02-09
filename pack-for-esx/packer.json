@@ -2,7 +2,8 @@
   "variables" : {
       "confdir" : ".",
       "passwd"  : "manager",
-      "ovf"     : "ubuntu.ovf"
+      "ovf"     : "ubuntu.ovf",
+      "flavour" : "esx"
   },
   "builders": [
     {
@@ -36,7 +37,12 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "{{user `confdir`}}/files/packer-esx",
+      "source": "{{user `confdir`}}/packer-files/packer-common",
+      "destination": "/tmp"
+    },
+    {
+      "type": "file",
+      "source": "{{user `confdir`}}/packer-files/packer-{{user `flavour`}}",
       "destination": "/tmp"
     },
     {

@@ -88,7 +88,8 @@ template_prefix = 'test'
 template_name = ''
 
 #Changed this to the EOS URL, when I can log in again.
-sess_url = 'https://vcloud.ceda.ac.uk'
+#Note that acces to this endpoint is firewall-restricted
+sess_url = 'https://vcloud.jasmin.ac.uk'
 sess_user = 'tbooth'
 sess_org = 'eoscloud-U'
 # Don't try to invoke the password helper yet - only if main() actually runs.
@@ -221,8 +222,8 @@ def init_session() :
     #Extract the element that looks like:
     '''
     <Link rel="down" type="application/vnd.vmware.vcloud.org+xml"
-          name="un-managed_tenancy_test_org"
-          href="https://vjasmin-vcloud-test.jc.rl.ac.uk/api/org/6483ae7d-2307-4856-a1c9-109751545b4c"/>
+          name="???_org"
+          href="https://vcloud.example.com/api/org/6483ae7d-2307-4856-a1c9-109751545b4c"/>
     '''
     orgurl = None
     for l in top_menu.findall('.//{%s}Link' % ns.vc) :

@@ -69,7 +69,7 @@ def munge_ovf_tree(dom, set_ovf_name = None, set_network_name = None) :
             ET.SubElement(gsect, "{%(vc)s}AdminPasswordAuto" % ns).text = 'false'
             ET.SubElement(gsect, "{%(vc)s}ResetPasswordRequired" % ns).text = 'false'
             ET.SubElement(gsect, "{%(vc)s}CustomizationScript" % ns).text = \
-                    '#!/bin/sh\n/etc/ESXCustomisation.sh "$@" ; [ 69 != $? ]\n'
+                    '#!/bin/sh\ncd /etc/ESXCustomisation && ./main.sh "$@" ; [ 69 != $? ]\n'
             # This gets overwritten later.
             ET.SubElement(gsect, "{%(vc)s}ComputerName" % ns).text = 'innominatus'
 

@@ -18,13 +18,13 @@ set -e
 #     exit 1
 # fi
 
-# Plan B - all files will be provided into /tmp/packer-esx
-tmpdir="/tmp/packer-esx"
+# Plan B - all files will be provided into /tmp/files/packer-common
+tmpdir="/tmp/packer-files"
 cd $tmpdir
 
 #wget "$BASEURL/setup.sh"
-chmod +x ./setup.sh
-./setup.sh
+chmod +x packer-*/setup.sh
+packer-common/setup.sh
 
 #Self-destruct
 rm -rf $tmpdir
