@@ -6,6 +6,8 @@ set -e
 # This would normally be the Bio-Linux OVF, but for testing I have minibuntu
 OVF="${OVF:-/home/tbooth_Public/packer/ubuntu_14.04_minimal.ova}"
 FLAVOUR="${FLAVOUR:-vanilla}"
+NETWORK="eoscloud-U-NERCvSE"
+PUSH="${PUSH:-0}"
 
 export PATH="$PATH:/home/tbooth/tings/bl8_vbox_autoinstall/packer/packer-0.7.1"
 export CONFDIR="$(readlink -f "`dirname $0`")"
@@ -13,6 +15,10 @@ export PATCH_VMDK="$CONFDIR/patch_vmdk"
 
 export PACKER_LOG=1
 #export DEBUG=-debug
+
+#Don't bother to have the script find itself; just run it in the current directory
+munger="`readlink -f ../uploader/munger.py`"
+uploader="`readlink -f ../uploader/uploader.py`"
 
 # Note prerequisites to build this thingy:
 ## packer 0.7+
@@ -57,18 +63,18 @@ for vmdk in output-virtualbox-ovf/*.vmdk ; do
     "$PATCH_VMDK" "$vmdk"
 done
 
+# Munge the XML.  This sused to be done as part of the upload but I've split it out.
+cd output-virtualbox-ovf/
+ovf_to_push=`ls -t *.ovf | head -n 1`
+[ -f "$ovf_to_push" ]
+
+"$munger" "$FLAVOUR" "$NETWORK" < "$ovf_to_push" > munged.ovf
+
 # Now push the result to EOS cloud
-if echo "$*" | grep -q -- -p ; then
+if [ "$PUSH" = 1 ] ; then
 
     prefix=`make_prefix "$OVF"`
 
-    uploader=/home/tbooth/sandbox/environmentalomics_github/uploader.py
-
-    cd output-virtualbox-ovf/
-
-    ovf_to_push=`ls -t *.ovf | head -n 1`
-    [ -f "$ovf_to_push" ]
-
-    "$uploader" minibuntu --ovf_file "$ovf_to_push" --prefix $prefix
+    "$uploader" minibuntu --ovf_file munged.ovf --prefix $prefix
 
 fi

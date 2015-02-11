@@ -3,7 +3,7 @@
 
 import unittest
 import re
-import lxml.etree as ET
+import xml.etree.ElementTree as ET
 from uploader import munge_ovf_data
 
 # Testing the uploader is a bit tricky as most functionality involves

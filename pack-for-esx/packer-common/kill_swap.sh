@@ -8,13 +8,14 @@
 # Exits 0 on success, 2 on a clean failure (eg. no swap found, no parted), 1 on an error
 # Final return status is that from parted
 
+# Delete swaps from fstab
 sudo sed -i '/^[^[:space:]]\+[[:space:]]\+[^[:space:]]\+[[:space:]]\+swap[[:space:]]\+/d' /etc/fstab
 
 if ! which parted >/dev/null 2>&1 ; then
 cat <<.
 WARNING: Parted is not installed on the image.  Automated resizing of the disk on
-         VM instantiation will not be possible, and the swap partition will be
-         disabled but not removed.
+         VM instantiation will not be possible, and the swap partition (if any)
+         will be disabled but not removed.
 .
 exit 2
 fi
@@ -22,7 +23,7 @@ fi
 # Remove the swap partition carefully.  Look only on the device mounted on /.
 # If there is only one partition > 4 and it is swap then remove the extended
 # partition.
-# Else, if the last partition is swap and then remove it.
+# Else, if the last partition is swap then remove it.
 
 # Discover the root device
 root_part=`df / | tail -n1 | awk '{print $1}'`
@@ -37,6 +38,7 @@ fi
 # Discover the swap device
 swaps_active=$(( `swapon -s | wc -l` - 1 ))
 if ! [ "$swaps_active" = 1 ] ; then
+    #TODO - should maybe continue and just remove the last swap??
     echo "Did not see one single swap device to remove."
     exit 2
 fi

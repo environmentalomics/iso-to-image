@@ -2,7 +2,7 @@
 # encoding: UTF-8
 
 import sys
-import lxml.etree as ET
+import xml.etree.ElementTree as ET
 from vCloudOVFMunger import munge_ovf_tree
 
 # Simple script that will munge stdin and spit result to stdout.

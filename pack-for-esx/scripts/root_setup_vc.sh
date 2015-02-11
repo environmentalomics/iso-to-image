@@ -18,13 +18,15 @@ set -e
 #     exit 1
 # fi
 
+# DEBUG - what uploaded?
+find /tmp
+
 # Plan B - all files will be provided into /tmp/files/packer-common
-tmpdir="/tmp/packer-files"
-cd $tmpdir
+cd /tmp
 
 #wget "$BASEURL/setup.sh"
 chmod +x packer-*/setup.sh
 packer-common/setup.sh
 
 #Self-destruct
-rm -rf $tmpdir
+rm -rf /tmp/packer-*

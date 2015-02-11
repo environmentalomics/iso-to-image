@@ -39,13 +39,13 @@ dpkg -P virtualbox-guest-{dkms,source,utils,x11}
 if [ -e /opt/vmware/lib/vmware-tools ] ; then
     echo "Seems a version of the VMWare guest tools are already installed"
 else
-    echo Installing the ESX guest tools
+    echo "Installing the ESX guest tools"
     # Grab VMwareTools-latest.tar.xz
     # Packer will ensure the file is there for me, or I could use packit.perl.
     # Note that I just tarred up the CD image, so I have to unpack twice.
 
     tar -xvf packer-common/VMWare_Guest_Tools_*.tar
-    tar -xvzf */VMwareTools-*.tar.gz
+    tar -xzf */VMwareTools-*.tar.gz
 
     ( cd vmware-tools-distrib &&
 	./vmware-install.pl --prefix=/opt/vmware --default ) || true
@@ -191,9 +191,11 @@ else
     cat packer-common/id_*.pub | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' "$prime_user"
 fi
 
-# Kill the swap.  Not appropriate on ESX, as far as I can see.  Also with no
+# Kill the swap.  Swap is appropriate on ESX, as far as I can see.  Also with no
 # swap partition we can more easily do a cheeky disk resize post-customisation.
-bash packer-common/kill_swap.sh
+# Note that a return val of 2 is to be regarded as success.
+echo "Running swap remover script."
+bash packer-common/kill_swap.sh || [ $? = 2 ]
 cp packer-common/expand_drive.sh /etc/ESXCustomisation/
 chmod +x /etc/ESXCustomisation/expand_drive.sh
 

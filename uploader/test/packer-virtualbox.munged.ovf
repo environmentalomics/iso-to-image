@@ -160,7 +160,7 @@
 	<vcloud:AdminPasswordAuto>false</vcloud:AdminPasswordAuto>
 	<vcloud:ResetPasswordRequired>false</vcloud:ResetPasswordRequired>
 	<vcloud:CustomizationScript>#!/bin/sh
-/etc/ESXCustomisation.sh &quot;$@&quot; ; [ 69 != $? ]
+cd /etc/ESXCustomisation &amp;&amp; ./main.sh &quot;$@&quot; ; [ 69 != $? ]
 </vcloud:CustomizationScript>
 	<vcloud:ComputerName>test-name</vcloud:ComputerName>
     </vcloud:GuestCustomizationSection>
