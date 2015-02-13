@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This is a script to install Docker as wanted by Priyam at QMUL.
 
@@ -23,7 +24,7 @@ if ! [ -e /usr/lib/apt/methods/https ] || \
    ! which apt-add-repository >/dev/null 2>&1 ; then
     apt-get update
     apt-get install -y apt-transport-https software-properties-common \
-	cron-apt ca-certificates
+	 ca-certificates
 fi
 apt-add-repository universe
 
