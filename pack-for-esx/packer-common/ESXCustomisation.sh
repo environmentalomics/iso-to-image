@@ -2,7 +2,7 @@
 
 # This script wants to bee hooked as the vcloud:CustomizationScript.  Later
 # there will be an alternative scheme called by CloudHands but for now just
-# call /etc/ESXCustomization.sh with the same args provided by VCloud.
+# call /etc/ESXCustomization/main.sh with the same args provided by VCloud.
 
 set -e
 
@@ -38,11 +38,11 @@ elif [ "$1" = postcustomization ] ; then
 
     hostname `cat /etc/hostname`
 
-    echo "Adding Google DNS to /etc/network/interfaces" >> $l
-    #Need a better fix for DNS.
+    echo "Adding local DNS to /etc/network/interfaces" >> $l
+    #I'm providing a dnsmasq cache from 192.168.3.2 (nodosaurus)
     cat >> /etc/network/interfaces <<.
-dns-nameservers 8.8.8.8 8.8.4.4
-dns-search nerc.ac.uk
+dns-nameservers 192.168.3.2 8.8.8.8 8.8.4.4
+dns-search local nerc.ac.uk
 .
 
     ifup -a
@@ -57,7 +57,8 @@ dns-search nerc.ac.uk
 
     # Claim any extra disk space.
     if [ -x ./expand_drive.sh ] ; then
-	env LOG_TO="$l" ./expand_drive.sh
+	echo "Trying to expand the drive." >> "$l"
+	./expand_drive.sh >>"$l" 2>&1 || [ $? = 2 ]
     fi
 
     # Refresh the console login screen to show the new hostname

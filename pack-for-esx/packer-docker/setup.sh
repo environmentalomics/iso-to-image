@@ -21,12 +21,12 @@ d-commit() { apt-get update && apt-get install -y $TO_INSTALL ; }
 
 # We need this before adding the docker repo
 if ! [ -e /usr/lib/apt/methods/https ] || \
-   ! which apt-add-repository >/dev/null 2>&1 ; then
+   ! which add-apt-repository >/dev/null 2>&1 ; then
     apt-get update
     apt-get install -y apt-transport-https software-properties-common \
 	 ca-certificates
 fi
-apt-add-repository universe
+add-apt-repository universe
 
 # Since we can't always validate the HTTPS cert, and all the packages are
 # signed anyway, do this:
@@ -55,8 +55,8 @@ d-install cgroup-lite git git-man liberror-perl aufs-tools
 
 # 2 - Install Ruby.  Priyam asked for 2.1 but we only have 2.0 in the
 # regular repo so we'll use Brightbox.
-# Using apt-add-repository as we had to install it in any case.
-apt-add-repostory ppa:brightbox/ruby-ng
+# Using add-apt-repository as we had to install it in any case.
+add-apt-repository ppa:brightbox/ruby-ng
 
 # Manual method was...
 # . /etc/lsb-release
@@ -66,6 +66,7 @@ apt-add-repostory ppa:brightbox/ruby-ng
 # .
 # apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C3173AA6
 
+d-install bind9-host
 d-install ruby2.1
 
 # Do this before creating the user.
