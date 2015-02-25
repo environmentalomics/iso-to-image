@@ -56,7 +56,7 @@ d-install cgroup-lite git git-man liberror-perl aufs-tools
 # 2 - Install Ruby.  Priyam asked for 2.1 but we only have 2.0 in the
 # regular repo so we'll use Brightbox.
 # Using add-apt-repository as we had to install it in any case.
-add-apt-repository ppa:brightbox/ruby-ng
+add-apt-repository ppa:brightbox/ruby-ng </dev/null
 
 # Manual method was...
 # . /etc/lsb-release
