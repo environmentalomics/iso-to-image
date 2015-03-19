@@ -81,10 +81,6 @@ fi
     #faked it.
     export FAKE_VMWARE_FTW=yes
     /opt/vmware/bin/vmware-config-tools.pl -p --default --skip-stop-start
-
-    # Or instead, do some manual fixing-upping
-#     tar -C / --no-same-owner -xvzf gtfixups_*.tar.gz
-#     depmod -A
 fi
 
 # I have to do something, according to Jonathan, to make the network work when the thing is
@@ -191,7 +187,7 @@ else
     cat packer-common/id_*.pub | su -c 'umask 077 ; cat >> ~/.ssh/authorized_keys' "$prime_user"
 fi
 
-# Kill the swap.  Swap is appropriate on ESX, as far as I can see.  Also with no
+# Kill the swap.  Swap is inappropriate on ESX, as far as I can see.  Also with no
 # swap partition we can more easily do a cheeky disk resize post-customisation.
 # Note that a return val of 2 is to be regarded as success.
 echo "Running swap remover script."
