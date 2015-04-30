@@ -1,3 +1,4 @@
+#!python3
 import sys
 import re
 import xml.etree.ElementTree as ET
@@ -107,11 +108,16 @@ def munge_ovf_tree(dom, set_ovf_name = None, set_network_name = None) :
     for elem in dom.findall('.//{%(vbox)s}Machine' % ns):
         tps[elem].remove(elem)
 
-    # Switch any VirtualHardwareSection/Item/rasd:ResourceSubType that is E1000 to be a VMXNET3
+    # Switch any VirtualHardwareSection/Item/rasd:ResourceType that is 10 (network card) to SubType VMXNET3
     xmlns_rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData"
-    for elem in dom.findall('.//{%(ovf)s}VirtualHardwareSection/{%(ovf)s}Item/{%(rasd)s}ResourceSubType' % ns):
-            if elem.findtext('.') == 'E1000':
-                elem.text = 'VMXNET3'
+    for elem in dom.findall('.//{%(ovf)s}VirtualHardwareSection/{%(ovf)s}Item/{%(rasd)s}ResourceType' % ns):
+            if elem.findtext('.') == '10':
+                subtypenode = tps[elem].find('{%(rasd)s}ResourceSubType' % ns)
+                if subtypenode is not None:
+                    subtypenode.text = 'VMXNET3'
+                else:
+                    subtypenode = ET.SubElement(tps[elem],'{%(rasd)s}ResourceSubType' % ns)
+                    subtypenode.text = 'VMXNET3'
 
     # Remove soundcards; we need them not
 #     for elem in dom.findall('.//VirtualHardwareSection/Item/{%s}ElementName' % xmlns_rasd):
