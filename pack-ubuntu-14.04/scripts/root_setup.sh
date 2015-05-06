@@ -8,12 +8,14 @@ set -e
 apt-get update -y -q > /dev/null
 
 # I can skip this, to make a release that really matches the ISO.
-# But then I can't be sure the apt-gets below will work.
+# But then I can't be fully sure the apt-gets below will work.
 # sudo apt-get upgrade -y > /dev/null
 
 # Install whatever
-#sudo apt-get -y -q install curl wget git tmux firefox xvfb vim
-#sudo apt-get -y -q install linux-headers-$(uname -r) build-essential dkms nfs-common
+# apt-get -y -q install curl wget git tmux firefox xvfb vim
+# apt-get -y -q install linux-headers-$(uname -r) build-essential dkms nfs-common
+
+# Needed by VirtualBox, I think
 apt-get -y install vim kbuild dkms
 
 #Stuff to make VirtualBox happy
