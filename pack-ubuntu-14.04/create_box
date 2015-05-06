@@ -8,22 +8,24 @@ export CONFDIR="$(readlink -f "`dirname $0`")"
 export PACKER_LOG=1
 #export DEBUG=-debug
 
+ISO="`readlink -e "$1"`"
+
 # Note prerequisites to build this thingy:
-## packer 0.6+
-## virtualbox
-## json_pp (optional)
+## packer 0.7.x (download from packer.io)
+## virtualbox (installed from .deb from virtualbox.org in my case)
+## json_pp (comes with Perl, so you should have it)
 
 # Build in my public area because it's not on encrypted loopback
 mkdir -p ~/Public/packer
 cd ~/Public/packer
 
 # It's useful for me to be able to comment lines in the JSON, but Packer doesn't like
-# this, so...
-json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
-    cp "$CONFDIR"/packer.json packer.pp.json
+# this (official JSON spec says no), so...
+json_pp <"$CONFDIR"/packer.json >packer.pp.json
 
 rm -rf packer_virtualbox-iso_virtualbox.box output-virtualbox-iso
 rm -rf ~/VirtualBox\ VMs/packer-virtualbox-iso  # careful!
-packer build $DEBUG -only virtualbox-iso -var confdir="$CONFDIR" ./packer.pp.json
 
+packer build $DEBUG -only virtualbox-iso \
+    -var confdir="$CONFDIR" -var iso="$ISO" ./packer.pp.json
 
