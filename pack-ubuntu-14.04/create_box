@@ -2,7 +2,7 @@
 
 set -e
 
-export PATH="$PATH:/home/tbooth/tings/bl8_vbox_autoinstall/packer/packer-0.7.1"
+export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
 export CONFDIR="$(readlink -f "`dirname $0`")"
 
 export PACKER_LOG=1

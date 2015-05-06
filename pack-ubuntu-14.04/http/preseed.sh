@@ -11,6 +11,8 @@ touch preseed.sh_actually_ran
 # directly, or use the apt-install and in-target commands to easily install
 # packages and run commands in the target system."
 # Don't put too much in here; rely on scripts/root_setup.sh
+# Also note the script is piped, which adds certain constraints.  If it gets
+# too messy use packit.perl.
 
 # First thing - I need to install ssh but I need to stop Packer from
 # connecting to it until the machine resets.  (Actually it won't anyway
@@ -26,8 +28,9 @@ cd preseed_ssh_debs
 # kernel command line.
 baseurl=`grep -wo url='[^[:space:]]*\.cfg' /proc/cmdline |sed 's,/[^/]*\.cfg$,,;s,url=,,'`
 
-# These debs worked when I was doing the build, but you may need to
-# refresh them.
+#On BL we have ssh already!
+if [ ! -e /target/usr/sbin/sshd ] ; then
+
 for deb in \
 libck-connector0_0.4.5-3.1ubuntu2_amd64.deb \
 ncurses-term_5.9+20140118-1ubuntu1_all.deb \
@@ -41,3 +44,5 @@ done
 
 # Install all packages in this dir, skipping anything already installed
 in-target dpkg -EGRi /tmp/preseed_ssh_debs
+
+fi
