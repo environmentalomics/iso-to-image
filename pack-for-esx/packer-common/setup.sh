@@ -29,6 +29,9 @@ if ! which dpkg ; then
     false
 fi
 
+echo Removing avahi-autoipd
+dpkg -P avahi-autoipd
+
 echo Removing the open-vm tools
 rm -f /etc/vmware-tools/*.old
 dpkg -P open-vm-tools open-vm-tools-desktop
