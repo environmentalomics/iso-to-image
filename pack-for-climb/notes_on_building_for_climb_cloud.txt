@@ -1,0 +1,35 @@
+Notes taken on 5th June in Warwick on Pete's cloud meeting.
+Talking to Simon Thompson who works at Birmingham and is CLIMB affiliated.
+
+To make a BL image from my standard VBox image:
+
+1) Remove VirtualBox drivers
+2) Add cloud-init
+     Edit cloud.cfg to make the manager account
+     cloud-init expects to create the account itself - can it be told not to?
+     At least, lock the password for the account
+     Or maybe just lock SSH?  Needs thought.
+3) Disable plymouth and set verbose text boot
+4) Take off Network Manager, as you do on EOS Cloud
+5) Convert VMDK to RAW using VBoxManage (see OpenStack docs) and discard the OVF stuff
+
+Simon sent the following extra notes:
+
+The avahi-autoipd, managed to get it clean off with apt-get purge instead
+of remove, apparently the if-up.d script must have changed at some point?
+
+
+To make the console and log work (/etc/default/grub):
+
+GRUB_CMDLINE_LINUX_DEFAULT=""
+GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,115200"
+
+
+I still haven¹t got metadata service working properly, there¹s something
+not quite right with my config maybe, it injected the ssh key into the
+ubuntu user (and if I add that user to the ssh group I can then ssh in),
+but I can¹t get it to do it into the manager user.
+
+I will make a copy of my pack-for-esx and then adapt it for this system.
+
+
