@@ -110,7 +110,8 @@ echo "SET grub-pc/install_devices /dev/sda" | debconf-communicate
 echo "SET grub-pc/install_devices_disks_changed /dev/sda" | debconf-communicate
 
 # Apparently this sets the debconf setting, not vice-versa
-sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT\)=.*/\1="ipv6.disable=1 text"/' /etc/default/grub
+sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT\)=.*/\1=""/' /etc/default/grub
+sed -i 's/^\(GRUB_CMDLINE_LINUX\)=.*/\1="ipv6.disable=1 text"/' /etc/default/grub
 
 dpkg-reconfigure -pcritical -u grub-pc
 
