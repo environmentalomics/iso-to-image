@@ -50,6 +50,21 @@ fi
 pt="`parted -sm "$root_dev" unit B print`"
 
 if ! [[ "`echo "$pt" | grep -A 1 "^$root_num:" | wc -l`" == 1 ]] ; then
+
+    # TODO - if there is one more partition and it is swap I should be able to
+    # do this:
+    #  0) Determine exact size and UUID of swap
+    #  1) swapoff -a
+    #  2) Delete it
+    #  3) If this leaves an empty logical partition delete that too
+    #  4) Expand root but leaving room for swap
+    #  5) Make an extended partition if root_type=primary
+    #  6) Make a new swap partition in the space
+    #  7) Format it
+    #  8) Munge /etc/fstab to ensure we see the new drive
+    # This is looking tricky, and a reading of the script from cloud-initramfs-growroot
+    # reveals many further gotchas for this to work in the general case.
+
     echo "Root partition is not the last one on the disk."
     exit 2
 fi
