@@ -9,7 +9,7 @@ FLAVOUR="${FLAVOUR:-vanilla}"
 NETWORK="eoscloud-U-NERCvSE"
 PUSH="${PUSH:-0}"
 
-export PATH="$PATH:/home/tbooth/tings/bl8_vbox_autoinstall/packer/packer-0.7.1"
+export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
 export CONFDIR="$(readlink -f "`dirname $0`")"
 export PATCH_VMDK="$CONFDIR/patch_vmdk"
 
@@ -21,9 +21,9 @@ munger="`readlink -f ../uploader/munger.py`"
 uploader="`readlink -f ../uploader/uploader.py`"
 
 # Note prerequisites to build this thingy:
-## packer 0.7+
-## virtualbox
-## json_pp (optional)
+## packer 0.7.x (download from packer.io)
+## virtualbox (installed from .deb from virtualbox.org in my case)
+## json_pp (comes with Perl, so you should have it)
 
 # Build in my Public area because it's not on encrypted loopback
 mkdir -p ~/Public/packer

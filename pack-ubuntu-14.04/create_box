@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Run this to make the .ova file for general use.  This will normally be
+# done on Auric as part of a new image build.
+
 set -e
 
 export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
@@ -15,7 +18,7 @@ ISO="`readlink -e "$1"`"
 ## virtualbox (installed from .deb from virtualbox.org in my case)
 ## json_pp (comes with Perl, so you should have it)
 
-# Build in my public area because it's not on encrypted loopback
+# Build in my Public area because it's not on encrypted loopback
 mkdir -p ~/Public/packer
 cd ~/Public/packer
 
