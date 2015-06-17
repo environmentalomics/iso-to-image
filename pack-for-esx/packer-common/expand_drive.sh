@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Update on 17/6/15 - apparently I can get this functionality from the
+# cloud-initramfs-growroot, so I need to see if this works.  Ideally it
+# might work on both VirtualBox and VCloud and if so I'll add it to the
+# standard VirtualBox build, along with instrux on how to make the hard drive
+# larger (bung these on the manager desktop!).
+
 # I have determined that, despite warnings from parted, it is actually possible
 # to on-line resize the root partition if the VM disk is enlarged.  This script
 # is designed to be hooked at the end of ESXCustomisation, just before VMWare triggers

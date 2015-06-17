@@ -17,10 +17,12 @@
         "initrd=/casper/initrd.lz boot=casper automatic-ubiquity noprompt --<enter><wait>"
       ],
       "boot_wait": "4s",
-      //Add these from the Ubuntu repo, not the ISO
+      // Add these from the Ubuntu repo, not the ISO
       "guest_additions_mode": "disable",
       "guest_os_type": "Ubuntu_64",
       "hard_drive_interface": "sata",
+      // The default is too low.  And it's dynamic anyway so why scrimp?
+      "disk_size": "100000",
       "headless": false,
       "http_directory": "{{user `confdir`}}/http",
       "iso_checksum": "",
