@@ -1,0 +1,68 @@
+{
+  "variables" : {
+      "confdir" : ".",
+      "passwd"  : "manager",
+      "ovf"     : "ubuntu.ovf"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "output_directory": "output-climb-build",
+      "source_path": "{{user `ovf`}}",
+      "ssh_username": "manager",
+      "ssh_password": "{{user `passwd`}}",
+      "ssh_wait_timeout": "120s",
+      "shutdown_command": "echo {{user `passwd`}} | sudo -S shutdown -P now",
+      "headless": true,
+      "virtualbox_version_file": ".vbox_version",
+      "guest_additions_mode": "disable",
+      // All VM settings will be ignored by OpenStack but this is useful for
+      // the build in any case.
+      "vboxmanage": [
+        [
+          "modifyvm", "{{.Name}}", "--memory", "2048"
+        ],
+        [
+          "modifyvm", "{{.Name}}", "--cpus", "2"
+        ]
+      ]
+    }
+  ],
+  "post-processors": [
+  ],
+  "provisioners": [
+    {
+      // Bung all the required files onto the image before running scripts.
+      "type": "file",
+      "source": "{{user `confdir`}}/packer-common",
+      "destination": "/tmp/"
+    },
+    {
+      // Standard provisioner for running the root setup.  In my case this just runs
+      // packer-common/setup.sh which does the actual setup.
+      "type": "shell",
+      "override": {
+        "virtualbox-ovf": {
+          "execute_command": "echo {{user `passwd`}} | sudo -S env {{ .Vars }} bash '{{ .Path }}'"
+       }
+      },
+      "scripts": [
+        "{{user `confdir`}}/scripts/root_setup.sh"
+      ]
+    },
+    {
+      // Standard provisioner for the per-user setup.  Most of this should be handled by
+      // cloud-init - eg. the SSH keys.
+      "type": "shell",
+      "override": {
+        "virtualbox-ovf": {
+          "execute_command": "env {{ .Vars }} bash '{{ .Path }}'"
+       }
+      },
+      "scripts": [
+        "{{user `confdir`}}/scripts/setup.sh"
+      ]
+    }
+  ]
+}
+

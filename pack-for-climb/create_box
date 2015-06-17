@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e
+
+# Note prerequisites to make this work:
+## packer 0.7+  (set the PATH below)
+## virtualbox
+## json_pp (optional but standard)
+
+# What OVF to actually work on?
+# This would normally be the Bio-Linux OVF, but for testing I have minibuntu
+OVF="${OVF:-/home/tbooth_Public/packer/ubuntu_14.04_minimal.ova}"
+
+# Where is a working packer 0.7+?
+export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
+export CONFDIR="$(readlink -f "`dirname $0`")"
+
+export PACKER_LOG=1
+#export DEBUG=-debug
+
+# Build in the Public area because it's not going to be on an encrypted
+# loopback if per-directory encryption is enabled.
+mkdir -p ~/Public/packer
+cd ~/Public/packer
+
+# Slightly paranoid/careful deletion of the old directory.
+# Note this is set as "output_directory": "output-climb-build" in
+# packer.json and will appear in your current working directory.
+if [ -d output-climb-build ] ; then
+    rm output-climb-build/*.ovf || true
+    rm output-climb-build/*.vmdk || true
+    rm output-climb-build/*.raw || true
+    rmdir output-climb-build
+fi
+
+# It's useful for me to be able to comment lines in the JSON, but Packer doesn't like
+# this, so...
+json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
+    cp "$CONFDIR"/packer.json packer.pp.json
+
+packer build $DEBUG -only virtualbox-ovf -var confdir="$CONFDIR" \
+    -var ovf="$OVF" ./packer.pp.json
+
+
+# Convert the .vmdk to a RAW disk file
+for vmdk in output-climb-build/*.vmdk ; do
+    [ -f "$vmdk" ] #just to be sure
+    VBoxManage clonehd "$vmdk" "${vmdk%.vmdk}"_raw.img --format raw
+done
+
+# Ready to upload?
+echo "Ready to upload image `readlink -f output-climb-build/*_raw.img`"
