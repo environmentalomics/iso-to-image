@@ -29,7 +29,7 @@ cd ~/Public/packer
 if [ -d output-climb-build ] ; then
     rm output-climb-build/*.ovf || true
     rm output-climb-build/*.vmdk || true
-    rm output-climb-build/*.raw || true
+    rm output-climb-build/*.img || true
     rmdir output-climb-build
 fi
 

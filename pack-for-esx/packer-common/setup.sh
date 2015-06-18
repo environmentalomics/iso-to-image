@@ -203,7 +203,13 @@ chmod +x /etc/ESXCustomisation/expand_drive.sh
 bash packer-common/unattended_upgrade.sh
 
 #After this, Packer can't work any more. You'd better have the key to get back in!
-sed -i 's/^#\?\(PasswordAuthentication \).*/\1 no/' /etc/ssh/sshd_config
+read -r -d '' admonishment <<"." || true
+# Password-based authentication has been disabled for accessing this Cloud system
+# as it is highly insecure.  Do not re-enable it!!  There are always alternatives.
+# Ask the Cloud system administrators for advice.
+.
+
+sed -i 's/^#\?\(PasswordAuthentication \).*/'"`awk 1 ORS='\\\\n' <<<"$admonishment"`"'\1 no/' /etc/ssh/sshd_config
 restart ssh
 
 # On the EOS cloud we don't currently have any valid nameservers set by vCloud, so for now

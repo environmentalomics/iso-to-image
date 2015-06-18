@@ -24,6 +24,10 @@ add-apt-repository universe
 apt-get update -y -q > /dev/null
 sudo apt-get -y install cloud-initramfs-growroot cloud-init
 
+# And replace the cloud.cfg file with my own
+[ -e /etc/cloud/cloud.cfg ] #It does exist, right?
+cat packer-common/cloud.cfg > /etc/cloud/cloud.cfg
+
 echo Removing avahi-autoipd
 dpkg -P avahi-autoipd
 
@@ -61,17 +65,10 @@ echo "SET grub-pc/install_devices /dev/sda" | debconf-communicate
 echo "SET grub-pc/install_devices_disks_changed /dev/sda" | debconf-communicate
 
 # Apparently this sets the debconf setting, not vice-versa
-sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT\)=.*/\1="ipv6.disable=1 text console=tty0 console=ttyS0,115200"/' \
-    /etc/default/grub
+sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT\)=.*/\1=""/' /etc/default/grub
+sed -i 's/^\(GRUB_CMDLINE_LINUX\)=.*/\1="text console=tty0 console=ttyS0,115200"/' /etc/default/grub
 
 dpkg-reconfigure -pcritical -u grub-pc
-
-# Also Exim needs to be told about lack of ipv6, if it is installed.
-rm -f /var/log/exim4/paniclog 2>/dev/null
-if echo "SET exim4/dc_local_interfaces 127.0.0.1" | debconf-communicate ; then
-    sed -i 's/\(dc_local_interfaces=\).*/\1'"'127.0.0.1'/" /etc/exim4/update-exim4.conf.conf
-    dpkg-reconfigure -pcritical exim4-config
-fi
 
 # Switch the default desktop to MATE
 # Note that auto-login for the manager user will have been set in preseed.cfg
@@ -96,10 +93,10 @@ ACTION=="add", SUBSYSTEM=="memory", ATTR{state}="online"
 EOF
 
 # NetworkManager runs and starts managing the network cards, which gets in the
-# way of cloud-init.  Doing this stops this from happening.
-sed -i 's/^\(iface [a-z0-9]* inet\) dhcp/\1 manual/' /etc/network/interfaces
+# way of ESX but maybe not cloud-init?
+#sed -i 's/^\(iface [a-z0-9]* inet\) dhcp/\1 manual/' /etc/network/interfaces
 
-# Leave it it to cloud-init to sort out SSH.  At this point just tweak the cloud-init
+# Leave it it to cloud-init to sort out SSH keys.  See the customised cloud.cfg
 # settings file.
 
 # Kill the swap.  Swap is inappropriate on CLIMB, as far as I can see.  Also with no
@@ -112,8 +109,14 @@ bash packer-common/kill_swap.sh || [ $? = 2 ]
 bash packer-common/unattended_upgrade.sh
 
 #After this, Packer can't work any more.  You'll either need to go in at the console
-#or else cloud-init needs to set up a new key.
-sed -i 's/^#\?\(PasswordAuthentication \).*/\1 no/' /etc/ssh/sshd_config
+#or else cloud-init needs to set up a working key.
+read -r -d '' admonishment <<"." || true
+# Password-based authentication has been disabled for accessing this Cloud system
+# as it is highly insecure.  Do not re-enable it!!  There are always alternatives.
+# Ask the Cloud system administrators for advice.
+.
+
+sed -i 's/^#\?\(PasswordAuthentication \).*/'"`awk 1 ORS='\\\\n' <<<"$admonishment"`"'\1 no/' /etc/ssh/sshd_config
 restart ssh
 
 
