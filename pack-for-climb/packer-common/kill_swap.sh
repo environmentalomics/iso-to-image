@@ -101,10 +101,11 @@ else
     fi
 fi
 
-if $(( $p_to_delete -lt 1 )) ; then
+if [[ "$p_to_delete" -lt 1 ]] ; then
     echo "Assertion failed."
     exit 1
 fi
 
 #Finally! (Return status is that from parted)
+swapoff -a
 parted -sm "$root_dev" rm "$p_to_delete"

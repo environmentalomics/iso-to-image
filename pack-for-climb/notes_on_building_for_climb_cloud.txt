@@ -10,7 +10,7 @@ To make a BL image from my standard VBox image:
      At least, lock the password for the account
      Or maybe just lock SSH?  Needs thought.
 3) Disable plymouth and set verbose text boot
-4) Take off Network Manager, as you do on EOS Cloud
+4) Turn off Network Manager, as you do on EOS Cloud
 5) Convert VMDK to RAW using VBoxManage (see OpenStack docs) and discard the OVF stuff
 
 Simon sent the following extra notes:

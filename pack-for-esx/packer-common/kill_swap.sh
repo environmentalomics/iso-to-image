@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This is UNTESTED!
+# This is not well tested!
 
 # Remove any swap.  You should have parted installed on the image so that extra drive
 # space can be configured on VM boot.
@@ -101,10 +101,11 @@ else
     fi
 fi
 
-if $(( $p_to_delete -lt 1 )) ; then
+if [[ "$p_to_delete" -lt 1 ]] ; then
     echo "Assertion failed."
     exit 1
 fi
 
 #Finally! (Return status is that from parted)
+swapoff -a
 parted -sm "$root_dev" rm "$p_to_delete"
