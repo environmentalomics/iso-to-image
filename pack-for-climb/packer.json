@@ -1,31 +1,45 @@
 {
   "variables" : {
       "confdir" : ".",
+      //Later in the build, password-based login via SSH will be disabled,
+      //but the manager password will remain as manager.
       "passwd"  : "manager",
-      "ovf"     : "ubuntu.ovf"
+      "iso"     : "bio-linux-latest.iso"
   },
   "builders": [
     {
-      "type": "virtualbox-ovf",
+      "type": "virtualbox-iso",
       "output_directory": "output-climb-build",
-      "source_path": "{{user `ovf`}}",
-      "ssh_username": "manager",
-      "ssh_password": "{{user `passwd`}}",
-      "ssh_wait_timeout": "120s",
-      "shutdown_command": "echo {{user `passwd`}} | sudo -S shutdown -P now",
-      "headless": true,
-      "virtualbox_version_file": ".vbox_version",
+      "boot_command": [
+        "<enter><enter><esc><enter> <wait>",
+        "/casper/vmlinuz.efi url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "hostname={{ .Name }} ",
+        "initrd=/casper/initrd.lz boot=casper automatic-ubiquity noprompt --<enter><wait>"
+      ],
+      "boot_wait": "4s",
+      // Add these from the Ubuntu repo, not the ISO
       "guest_additions_mode": "disable",
-      // All VM settings will be ignored by OpenStack but this is useful for
-      // the build in any case.
+      "guest_os_type": "Ubuntu_64",
+      "hard_drive_interface": "sata",
+      // 20GB for the smallest CLIMB instance
+      "disk_size": "20000",
+      "headless": false,
+      "http_directory": "{{user `confdir`}}/http",
+      "iso_checksum": "",
+      "iso_checksum_type": "none",
+      "iso_url": "file://{{user `iso`}}",
+      "shutdown_command": "echo {{user `passwd`}} | sudo -S shutdown -P now",
+      "ssh_password": "{{user `passwd`}}",
+      "ssh_username": "manager",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      // Won't affect how the image runs on CLIMB but useful for the build...
       "vboxmanage": [
-        [
-          "modifyvm", "{{.Name}}", "--memory", "2048"
-        ],
-        [
-          "modifyvm", "{{.Name}}", "--cpus", "2"
-        ]
-      ]
+        [ "modifyvm", "{{.Name}}", "--memory", "2048" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "2" ],
+        [ "modifyvm", "{{.Name}}", "--nictype1", "virtio" ]
+      ],
+      "virtualbox_version_file": ".vbox_version"
     }
   ],
   "post-processors": [

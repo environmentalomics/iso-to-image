@@ -5,8 +5,8 @@ set -e
 # A script to ensure that the Ubuntu host is ready to run on CLIMB.  While this
 # script is goint to be user for Bio-Linux I'd like it to work on any Ubuntu 14.04
 # and it will be tested on minibuntu.
-# The script needs to run fully in VirtualBox.  Ideally it should need no network
-# access.
+# Ideally this should work both for building from ISO or from OVA, so some of the
+# actions will be redundant in any given scenario.
 
 # Sanity check
 if ! which dpkg ; then
@@ -16,12 +16,24 @@ fi
 
 # On minibuntu we have neither the Universe repo active nor add-apt-repository
 # available to make it so.  Bootstrap to be sure.
+echo Ensuring Universe packages are available
 apt-get update -y -q > /dev/null
 apt-get install -y apt-transport-https software-properties-common ca-certificates
 add-apt-repository universe
 
-#Again...
+#Again, since we just added a new source...
 apt-get update -y -q > /dev/null
+
+echo Ensuring we have appropriate kernel headers and nfs-common
+kernel_headers=linux-headers-generic
+lts_kernel=`dpkg -l | awk '{print $2}' | grep ^linux-image-generic-lts- | awk -F- '{print $5}'`
+if [ -n "$lts_kernel" ] ; then
+    kernel_headers=linux-headers-generic-lts-"$lts_kernel"
+fi
+
+apt-get -y install "$kernel_headers" nfs-common
+
+echo Adding the cloud-init packages
 sudo apt-get -y install cloud-initramfs-growroot cloud-init
 
 # And replace the cloud.cfg file with my own

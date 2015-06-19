@@ -9,7 +9,7 @@ set -e
 
 # What OVF to actually work on?
 # This would normally be the Bio-Linux OVF, but for testing I have minibuntu
-OVF="${OVF:-/home/tbooth_Public/packer/ubuntu_14.04_minimal.ova}"
+ISO="${OVF:-$HOME/Downloads/bio-linux-latest.iso}"
 
 # Where is a working packer 0.7+?
 export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
@@ -38,7 +38,7 @@ fi
 json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
     cp "$CONFDIR"/packer.json packer.pp.json
 
-packer build $DEBUG -only virtualbox-ovf -var confdir="$CONFDIR" \
+packer build $DEBUG -only virtualbox-iso -var confdir="$CONFDIR" \
     -var ovf="$OVF" ./packer.pp.json
 
 
