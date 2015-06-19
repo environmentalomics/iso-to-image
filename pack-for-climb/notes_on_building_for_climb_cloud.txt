@@ -1,3 +1,12 @@
+Update on 19/6:
+
+I got this all working, but it's making a raw .img file of 100GB.  What I
+really want is a 20GB image and for cloud-initramfs-growroot to work it's
+magic.  I think it should work on CLIMB.  So I'm re-doing the build to
+run off the ISO and build a 20GB system.
+
+---
+
 Notes taken on 5th June in Warwick on Pete's cloud meeting.
 Talking to Simon Thompson who works at Birmingham and is CLIMB affiliated.
 
@@ -25,7 +34,7 @@ GRUB_CMDLINE_LINUX_DEFAULT=""
 GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,115200"
 
 
-I still haven¹t got metadata service working properly, there¹s something
+I still havent got metadata service working properly, theres something
 not quite right with my config maybe, it injected the ssh key into the
 ubuntu user (and if I add that user to the ssh group I can then ssh in),
 but I can¹t get it to do it into the manager user.
