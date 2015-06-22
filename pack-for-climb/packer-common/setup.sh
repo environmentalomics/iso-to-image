@@ -21,7 +21,19 @@ apt-get update -y -q > /dev/null
 apt-get install -y apt-transport-https software-properties-common ca-certificates
 add-apt-repository universe
 
-#Again, since we just added a new source...
+# Do I need this??
+mirrr="`apt-cache policy coreutils | grep -o '^ \{8\}[0-9]\+ [a-z]\+://[^[:space:]]\+' | awk '{print $NF}' | uniq`"
+if [ -z "$mirrr" ] || [ `echo "$mirrr" | wc -l` != 1 ] ; then
+    echo "Cannot infer what mirror was in use."
+    false
+fi
+
+old_mirrr="`echo "$mirrr" | sed 's/[,\/&]/\\\\&/g'`"
+new_mirrr="`echo "http://nova.clouds.archive.ubuntu.com/ubuntu/" | sed 's/[,\/&]/\\\\&/g'`"
+
+sed -i "s, $old_mirrr , $new_mirrr ," /etc/apt/sources.list
+
+#Again, since we just added a new source and new mirror...
 apt-get update -y -q > /dev/null
 
 echo Ensuring we have appropriate kernel headers and nfs-common

@@ -56,7 +56,7 @@
       // packer-common/setup.sh which does the actual setup.
       "type": "shell",
       "override": {
-        "virtualbox-ovf": {
+        "virtualbox-iso": {
           "execute_command": "echo {{user `passwd`}} | sudo -S env {{ .Vars }} bash '{{ .Path }}'"
        }
       },
@@ -69,7 +69,7 @@
       // cloud-init - eg. the SSH keys.
       "type": "shell",
       "override": {
-        "virtualbox-ovf": {
+        "virtualbox-iso": {
           "execute_command": "env {{ .Vars }} bash '{{ .Path }}'"
        }
       },

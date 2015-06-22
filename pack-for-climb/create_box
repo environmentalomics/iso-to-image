@@ -9,7 +9,7 @@ set -e
 
 # What OVF to actually work on?
 # This would normally be the Bio-Linux OVF, but for testing I have minibuntu
-ISO="${OVF:-$HOME/Downloads/bio-linux-latest.iso}"
+ISO="${OVF:-$HOME/Downloads/bio-linux-8-latest.iso}"
 
 # Where is a working packer 0.7+?
 export PATH="$PATH:/opt/packer/packer_0.7:$HOME/packer/packer_0.7"
@@ -39,7 +39,7 @@ json_pp <"$CONFDIR"/packer.json >packer.pp.json ||
     cp "$CONFDIR"/packer.json packer.pp.json
 
 packer build $DEBUG -only virtualbox-iso -var confdir="$CONFDIR" \
-    -var ovf="$OVF" ./packer.pp.json
+    -var iso="$ISO" ./packer.pp.json
 
 
 # Convert the .vmdk to a RAW disk file
@@ -47,6 +47,7 @@ for vmdk in output-climb-build/*.vmdk ; do
     [ -f "$vmdk" ] #just to be sure
     VBoxManage clonehd "$vmdk" "${vmdk%.vmdk}"_raw.img --format raw
 done
+chmod 644 output-climb-build/*
 
 # Ready to upload?
 echo "Ready to upload image `readlink -f output-climb-build/*_raw.img`"
