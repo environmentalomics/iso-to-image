@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # encoding: UTF-8
 
+import sys
 import unittest
 import re
 import xml.etree.ElementTree as ET
+
+#Do this prior to loading the local modules.
+sys.path.insert(0, '.')
+
 from uploader import munge_ovf_data
 
 # Testing the uploader is a bit tricky as most functionality involves
@@ -15,7 +20,7 @@ from uploader import munge_ovf_data
 class XMLTests(unittest.TestCase):
 
     def setUp(self):
-        self.files_to_test = ('centos6-stemcell', 'packer-virtualbox')
+        self.files_to_test = ('centos6-stemcell', 'packer-virtualbox', 'packer-again')
         self.data_dir = 'test'
 
     def tearDown(self):
@@ -28,6 +33,9 @@ class XMLTests(unittest.TestCase):
 
     def test_munge_file_1(self):
         self._test_munge(self.files_to_test[1])
+
+    def test_munge_file_2(self):
+        self._test_munge(self.files_to_test[2])
 
     def _test_munge(self, filename):
 

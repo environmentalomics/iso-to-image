@@ -99,28 +99,30 @@ def munge_ovf_tree(dom, set_ovf_name = None, set_network_name = None) :
             elem.set("{%(vmw)s}osType" % ns, "ubuntu64Guest")
 
     # Force the VirtualSystemType to vmx-10
-    xmlns_vssd = "http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData"
     for elem in dom.findall('{%(ovf)s}VirtualSystem//{%(vssd)s}VirtualSystemType' % ns):
             elem.text = 'vmx-10'
 
     # Prune out the whole vbox:Machine section
-    xmlns_vbox="http://www.virtualbox.org/ovf/machine"
     for elem in dom.findall('.//{%(vbox)s}Machine' % ns):
         tps[elem].remove(elem)
 
     # Switch any VirtualHardwareSection/Item/rasd:ResourceType that is 10 (network card) to SubType VMXNET3
-    xmlns_rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData"
     for elem in dom.findall('.//{%(ovf)s}VirtualHardwareSection/{%(ovf)s}Item/{%(rasd)s}ResourceType' % ns):
             if elem.findtext('.') == '10':
                 subtypenode = tps[elem].find('{%(rasd)s}ResourceSubType' % ns)
                 if subtypenode is not None:
                     subtypenode.text = 'VMXNET3'
                 else:
-                    subtypenode = ET.SubElement(tps[elem],'{%(rasd)s}ResourceSubType' % ns)
+                    #This needs to insert the value before the type, but that's tricky
+                    #to do with ET.
+                    parent_node = tps[elem]
+                    parent_node.remove(elem)
+                    subtypenode = ET.SubElement(parent_node,'{%(rasd)s}ResourceSubType' % ns)
                     subtypenode.text = 'VMXNET3'
+                    elem = ET.SubElement(parent_node,'{%(rasd)s}ResourceType' % ns)
+                    elem.text = '10'
 
     # Remove soundcards; we need them not
-#     for elem in dom.findall('.//VirtualHardwareSection/Item/{%s}ElementName' % xmlns_rasd):
     for elem in dom.findall('.//{%(ovf)s}VirtualHardwareSection/{%(ovf)s}Item/{%(rasd)s}ElementName' % ns):
         if elem.findtext('.') == 'sound':
             # Remove the parent of elem

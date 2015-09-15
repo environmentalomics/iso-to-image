@@ -68,7 +68,7 @@ cd output-virtualbox-ovf/
 ovf_to_push=`ls -t *.ovf | head -n 1`
 [ -f "$ovf_to_push" ]
 
-"$munger" "$FLAVOUR" "$NETWORK" < "$ovf_to_push" > munged.ovf
+"$munger" "$FLAVOUR" "$NETWORK" < "$ovf_to_push" | xml_pp > munged.ovf
 
 # Now push the result to EOS cloud
 if [ "$PUSH" = 1 ] ; then
