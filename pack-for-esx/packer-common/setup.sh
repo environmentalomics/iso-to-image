@@ -29,6 +29,9 @@ if ! which dpkg ; then
     false
 fi
 
+# This can stop the script jamming due to questions about config updates
+export UCF_FORCE_CONFFOLD=1
+
 echo Removing avahi-autoipd
 dpkg -P avahi-autoipd
 
@@ -113,7 +116,7 @@ echo "SET grub-pc/install_devices_disks_changed /dev/sda" | debconf-communicate
 sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT\)=.*/\1=""/' /etc/default/grub
 sed -i 's/^\(GRUB_CMDLINE_LINUX\)=.*/\1="ipv6.disable=1 text"/' /etc/default/grub
 
-dpkg-reconfigure -pcritical -u grub-pc
+dpkg-reconfigure -pcritical -ftext -u grub-pc
 
 # Also Exim needs to be told about this, if it is installed.
 rm -f /var/log/exim4/paniclog 2>/dev/null
