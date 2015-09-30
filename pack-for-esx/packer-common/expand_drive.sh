@@ -24,6 +24,14 @@ if ! which parted >/dev/null 2>&1 ; then
     exit 2
 fi
 
+# Specifically we need a version of Parted that has the patch
+#   0004-parted-make-_partition_warn_busy-actually-a-warning.patch
+# applied.  This means we need the version from Trusty, even though it
+# appears to be the same version as the one in Precise.  Note that if you do upgrade
+# parted the script will not work fully on Precise as the Kernel will reject the modification
+# to the live partitions.  You can rectify matters by rebooting and running
+# "resize2fs /dev/..." manually.
+
 # Discover the root device
 root_part=`df / | tail -n1 | awk '{print $1}'`
 root_dev=${root_part%%[1-9]*}
