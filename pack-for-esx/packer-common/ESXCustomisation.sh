@@ -39,7 +39,10 @@ elif [ "$1" = postcustomization ] ; then
     hostname `cat /etc/hostname`
 
     echo "Adding local DNS to /etc/network/interfaces" >> $l
-    #I'm providing a dnsmasq cache from 192.168.3.2 (nodosaurus)
+    #I'm providing a dnsmasq cache from 192.168.3.2 (nodosaurus) so use
+    #that if poss.  Could configure it in VCD but not the dns-search line.
+    sed -i '/^dns-/d' /etc/network/interfaces
+
     cat >> /etc/network/interfaces <<.
 dns-nameservers 192.168.3.2 8.8.8.8 8.8.4.4
 dns-search local nerc.ac.uk
