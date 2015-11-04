@@ -12,14 +12,14 @@ Why do you care?
 
 If you are interested in auto-building Ubuntu images, or supporting Ubuntu on VCloud,
 then you might find this useful.
-It requires no rpoprietary software or manual intervention - ie. you can auto-build on
+It requires no proprietary software or manual intervention - ie. you can auto-build on
 any Linux server without paying for extra licenses for VMWare stuff.
 
 Why is it so messy?
 -------------------
 
 This is not currently a finished product and you are not going to be able to
-run it out of the box.  The scripts have grown organically as I worked out all
+run it out-of-the-box.  The scripts have grown organically as I worked out all
 the steps that were needed and the hacks to make them work.  To make this into
 a solid package of code would mean a total re-write, which may or may not happen.
 But I'm hoping that by publishing my recipes I can save others from having to
